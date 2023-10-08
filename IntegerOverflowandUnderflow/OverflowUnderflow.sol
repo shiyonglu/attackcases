@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.5.12;
 
-contract underflow{
+contract Underflow{
     mapping(address => uint)balance;
     
 
@@ -20,4 +20,16 @@ contract underflow{
     }
 
     
+}
+
+
+contract Attacker {
+    Underflow public immutable  myunderflow;
+    address public owner; 
+
+    constructor(address payable _underflowContractAddress) {
+        myunderflow = Underflow(_underflowContractAddress);
+        owner=msg.sender;
+    }
+
 }

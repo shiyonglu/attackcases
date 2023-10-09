@@ -31,7 +31,6 @@ contract txorigin_wallet{
 
 ``` 
 
- 
 
 
 # How does it happen?
@@ -67,7 +66,6 @@ contract attacktxorigin{
 
 
 ``` 
-
 
 
 # How to prevent?

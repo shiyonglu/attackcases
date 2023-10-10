@@ -1,5 +1,3 @@
-asfasf
-
 /**
  ***  Accounting probblem: 
  **** Two problems: 1) when totalBalance == 0, remainingRewards is decreased but rewardPerToken is not increased

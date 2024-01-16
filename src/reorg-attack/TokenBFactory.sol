@@ -12,6 +12,11 @@ contract TokenBFactory {
  
     function deployTokenB(address assetToken, bytes32 _salt) public returns (TokenB tokenB){
               tokenB = new TokenB{salt: _salt}(IERC20(assetToken));
+
+              // fix the vulnerablity of reorg attack like this: 
+              // bytes32 newSalt = keccak256(abi.encodePacked(_salt, abi.encode(msg.sender)));
+              // tokenB = new TokenB{salt: newSalt}(IERC20(assetToken));
+
               tokenB.transferOwnership(msg.sender);
     }
 }

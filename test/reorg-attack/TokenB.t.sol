@@ -34,9 +34,7 @@ contract TokenBTest is Test {
     }
 
     function testPredictedAddress() public {
-        bytes32 newSalt = keccak256(abi.encodePacked(salt_, abi.encode(deployer)));
-
-        address predictedAddress = calculateDeploymentAddress(address(tokenBFactory), newSalt, type(TokenB).creationCode, address(ppswap));
+        address predictedAddress = calculateDeploymentAddress(address(tokenBFactory), salt_, type(TokenB).creationCode, address(ppswap));
         console2.log("predictedAddress:", predictedAddress);
  
          vm.prank(deployer);

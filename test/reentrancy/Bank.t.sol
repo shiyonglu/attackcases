@@ -1,8 +1,8 @@
 pragma solidity 0.8.17;
 
 import "forge-std/Test.sol";
-import "../src/bank.sol";
-import "../src/attack002.sol";
+import "../../src/reentrancy/bank.sol";
+// import "../src/attack002.sol";
 
 /* this contract, Bob: deployer
    address(1): Alice: trustAccount, 

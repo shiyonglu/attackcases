@@ -53,6 +53,6 @@ contract Attack {
 
         // cast address to payable
         address payable addr = payable(address(etherGame));
-        selfdestruct(addr);
+        // selfdestruct(addr);
     }
 }

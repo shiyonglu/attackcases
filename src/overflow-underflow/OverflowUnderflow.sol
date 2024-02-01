@@ -24,7 +24,7 @@ contract Underflow{
 
 
 contract Attacker {
-    Underflow public immutable  myunderflow;
+    Underflow public  myunderflow;
     address public owner; 
 
     constructor(address payable _underflowContractAddress) {

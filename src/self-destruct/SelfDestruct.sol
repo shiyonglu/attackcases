@@ -52,7 +52,7 @@ contract Attack {
         // the game balance >= 7 ether
 
         // cast address to payable
-        address payable addr = payable(address(etherGame));
+        // address payable addr = payable(address(etherGame));
         // selfdestruct(addr);
     }
 }

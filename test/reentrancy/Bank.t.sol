@@ -1,7 +1,7 @@
 pragma solidity 0.8.17;
 
 import "forge-std/Test.sol";
-import "../../src/reentrancy/bank.sol";
+import "../../src/reentrancy/Bank.sol";
 // import "../src/attack002.sol";
 
 /* this contract, Bob: deployer
@@ -9,13 +9,13 @@ import "../../src/reentrancy/bank.sol";
 */
 
 contract testBank is Test {
-    bank mybank;
+    Bank mybank;
     Attacker alice;
 
     
 
     function setUp() public {
-        mybank = new bank();
+        mybank = new Bank();
         // alice = new Attacker(payable(mybank));
         
         (bool success, ) = address(mybank).call{value: 1000000}("");

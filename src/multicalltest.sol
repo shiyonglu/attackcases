@@ -67,6 +67,8 @@ contract MyTest is Test {
 
      bytes memory data = abi.encodeWithSignature("deposit()");
      (bool success, ) = address(vul).call{value: 1e18}(data);
+     require(success);
+
      console2.log("balance: %d", vul.balanceOf(address(this)));
    
      multicalldata[0] = data;

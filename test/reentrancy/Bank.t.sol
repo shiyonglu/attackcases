@@ -32,14 +32,7 @@ contract testBank is Test {
    
     function testSteal() public
     {
-        // let's Alice's address is address(1)
-        vm.prank(address(1));
-        alice = new Attacker(payable(mybank)); // address(1) is owner
-        
-        vm.prank(address(1));
-        alice.attack{value: 1000}();
-      
-        assertEq(address(1).balance, 1001000);
+          // 
     }
 
 

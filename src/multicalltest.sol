@@ -40,7 +40,8 @@ contract VulnerableWETH is ERC20, Multicall {
     
     function withdraw(uint256 value) external {
         _burn(msg.sender, value);
-        msg.sender.call{value: value}("");
+          (bool success, ) = msg.sender.call{value: value}("");
+        require(success);
     }
     
     function withdrawAll() external {

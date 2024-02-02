@@ -3,24 +3,24 @@
  *  1.  simulate locally
  *        forge script script/Aution.s.sol
  *  2. simulate remotely 
- *        forge script script/DeployTokenA.s.sol:DeployTokenAScript --rpc-url $POLYGON_RPC_URL
+ *      forge script script/Auction.s.sol --rpc-url $POLYGON_RPC_URL
  * 
  *      $POLYGON_RPC_URL is obtained from https://www.alchemy.com/ (or https://www.infura.io/) and cofigured at ~/.bashrc
  * 
  *  3. deploy in real 
- *     forge script script/DeployTokenA.s.sol:DeployTokenAScript --rpc-url $POLYGON_RPC_URL --broadcast
- *     for example: forge script script/DeployTokenA.s.sol --rpc-url https://polygon-rpc.com --broadcast
+ *     forge script script/Auction.s.sol --rpc-url $POLYGON_RPC_URL --broadcast
+ *     for example: forge script script/Auction.s.sol --rpc-url https://polygon-rpc.com --broadcast
  *  
  *  4. deploy and verify the contract
- *      forge script script/DeployTokenA.s.sol:DeployTokenAScript --rpc-url $POLYGON_RPC_URL --broadcast --verify src/TokenA.sol:TokenA -etherscan-api-key $POLYSCAN_API_KEY
+ *      forge script script/Auction.s.sol --rpc-url $POLYGON_RPC_URL --broadcast --verify src/dos-attack/Auction.sol:Auction --etherscan-api-key $POLYSCAN_API_KEY
  *   
  *  5. Just verify after deployment: 
- *     forge verify-contract --verifier-url https://api.polygonscan.com/api/ 0x4663948dad67359c767662DF8D7F79136e8361dA src/TokenA.sol:TokenA --etherscan-api-key $POLYSCAN_API_KEY
+ *     forge verify-contract --verifier-url https://api.polygonscan.com/api/ <contract-address> src/dos-attack/Auction.sol:Auction --etherscan-api-key $POLYSCAN_API_KEY
  */
 
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.17;
 
 import {Script, console2} from "forge-std/Script.sol";
 import {Auction} from "../src/dos-attack/Auction.sol";

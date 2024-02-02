@@ -5,7 +5,7 @@ interface Iauction{
         function bid() payable external;
 }
 
-contract attackt004{
+contract Attacker{
          address public owner;
          Iauction public immutable auc;
 

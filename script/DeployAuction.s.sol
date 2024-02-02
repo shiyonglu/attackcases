@@ -1,7 +1,7 @@
 /*
  *  Command: 
  *  1.  simulate locally
- *        forge script script/DeployTokenA.s.sol:DeployTokenAScript
+ *        forge script script/Aution.s.sol
  *  2. simulate remotely 
  *        forge script script/DeployTokenA.s.sol:DeployTokenAScript --rpc-url $POLYGON_RPC_URL
  * 

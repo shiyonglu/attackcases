@@ -1,4 +1,11 @@
-contract SnapshotMerkleDistribution  is ReentrancyGuard, Ownable {
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol"; // Importing Ownable for access control
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+
+contract Distribution  is ReentrancyGuard, Ownable {
 
     ERC721Enumerable public nftContract;
 

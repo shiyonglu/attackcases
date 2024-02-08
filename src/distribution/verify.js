@@ -1,5 +1,5 @@
 // Merkle Tree generation 
-const wscOwnerAddresses = require('./wscOwnerAddressesSnapshot.json');
+const wscOwnerAddresses = require('./snapshot.json');
 const { getAddress} = require('ethers');
 const { MerkleTree } = require('merkletreejs');
 const keccac256 = require('keccak256');

@@ -33,7 +33,7 @@ import {TokenB} from "../../src/first-depositor-attack/TokenB.sol";
 import {TokenBFactory} from "../../src/first-depositor-attack/TokenBFactory.sol";
 
 
-contract TokenBTest is Test {
+contract PPSVault is Test {
     PPSwap ppswap;
     TokenB tokenB;
     TokenBFactory tokenBFactory;

@@ -58,7 +58,7 @@ contract RefundTest is Test {
     }
  
      // These users have 1, 2, 3, 4 NFTs
-    function testTotal() public{
+    function testTotal() public view{
         console2.log("user1 balance: ", wscContract.balanceOf(user1));
         console2.log("user2 balance: ", wscContract.balanceOf(user2));
         console2.log("user3 balance: ", wscContract.balanceOf(user3));

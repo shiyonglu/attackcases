@@ -5,7 +5,7 @@ import {Test, console2} from "forge-std/Test.sol";
  
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
  
-import {Distribution} from "../src/Distribution.sol";
+import {Distribution} from "../src/distribution/Distribution.sol";
  
  
 interface IWSCContract{

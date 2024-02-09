@@ -29,7 +29,7 @@ pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {PPSwap} from "../..//src/first-depositor-attack/PPSwap.sol";
-import {TokenB} from "../../src/first-depositor-attack/TokenB.sol";
+import {PPSVault} from "../../src/first-depositor-attack/PPSVault.sol";
 import {TokenBFactory} from "../../src/first-depositor-attack/TokenBFactory.sol";
 
 

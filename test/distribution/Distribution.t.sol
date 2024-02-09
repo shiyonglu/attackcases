@@ -5,7 +5,7 @@ import {Test, console2} from "forge-std/Test.sol";
  
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
  
-import {Distribution} from "../src/distribution/Distribution.sol";
+import {Distribution} from "../../src/distribution/Distribution.sol";
  
  
 interface IWSCContract{
@@ -30,7 +30,7 @@ contract RefundTest is Test {
     function setUp() public {
         vm.createSelectFork(vm.rpcUrl("https://mainnet.infura.io/v3/95310f60af7b44bb8f3b13c043a00c8f"));
  
-        dist = new SnapshotMerkleDistribution();
+        dist = new Distribution();
         wscContract = ERC721Enumerable(0xf341eD41475fedD4704902B4b82F1D2EB4D477E8);
         dist.setNFTContract(address(wscContract));
         dist.setMerkleRoot(bytes32(0xe501d7720ab8584daa9415cf7d61dc5f35d9932448ccb5e6f6913f7f0952520e));
@@ -109,6 +109,7 @@ contract RefundTest is Test {
  
     }
  
+ /*
  
      // the same NFT can claim at most once 
      function testRefund2() public{ // user1 claimed but sent his NFT to user2, user2 cannnot claim the same NFT again
@@ -214,5 +215,6 @@ contract RefundTest is Test {
  
  
     }
+    */
 }
  

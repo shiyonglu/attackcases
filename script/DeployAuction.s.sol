@@ -1,5 +1,6 @@
 /*
- *  Command:
+ *This is a helper funciton for 001-dos-attack test case
+ Command:
  *  1.  simulate locally
  *        forge script script/Aution.s.sol
  *  2. simulate remotely

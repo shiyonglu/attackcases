@@ -7,17 +7,14 @@
    his shares from the vault. The stealing completes. 
 */
 
-
-
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {PPSwap} from "../..//src/flashloan-attack/PPSwap.sol";
-import {PPSVault} from "../../src/flashloan-attack/PPSVault.sol";
-import {PPSVaultFactory} from "../../src/flashloan-attack/PPSVaultFactory.sol";
-import {FlashLoanAttacker} from "../../src/flashloan-attack/FlashLoanAttacker.sol";
-
+import {PPSwap} from "../..//src/004-flashloan-attack/PPSwap.sol";
+import {PPSVault} from "../../src/004-flashloan-attack/PPSVault.sol";
+import {PPSVaultFactory} from "../../src/004-flashloan-attack/PPSVaultFactory.sol";
+import {FlashLoanAttacker} from "../../src/004-flashloan-attack/FlashLoanAttacker.sol";
 
 contract PPSVaultTest is Test {
     PPSwap ppswap;
@@ -28,18 +25,16 @@ contract PPSVaultTest is Test {
     address attacker = makeAddr("attacker");
     address depositor1 = makeAddr("depositor1");
     address depositor2 = makeAddr("depositor2");
-    
 
     function setUp() public {
         ppswap = new PPSwap();
-        ppswap.transfer(deployer, 2000 ether);  
+        ppswap.transfer(deployer, 2000 ether);
         ppswap.transfer(depositor1, 2000 ether);
         ppswap.transfer(depositor2, 2000 ether);
 
         vm.startPrank(deployer);
         ppsVaultFactory = new PPSVaultFactory();
         ppsVault = ppsVaultFactory.deployPPSVault(address(ppswap), salt_);
-
 
         vm.startPrank(depositor1);
         ppswap.approve(address(ppsVault), 2000 ether);
@@ -55,7 +50,9 @@ contract PPSVaultTest is Test {
     function testFlashLoanAttack() public {
         console2.log("attacker PPS balance:", ppswap.balanceOf(attacker));
         vm.startPrank(attacker);
-        FlashLoanAttacker flashLoanAttacker = new FlashLoanAttacker(address(ppsVault));
+        FlashLoanAttacker flashLoanAttacker = new FlashLoanAttacker(
+            address(ppsVault)
+        );
         flashLoanAttacker.callFlashLoan(3000 ether);
         vm.stopPrank();
         console2.log("attacker PPS balance:", ppswap.balanceOf(attacker));

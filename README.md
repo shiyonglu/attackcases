@@ -97,7 +97,7 @@ Here is the list of the vulnerabilities:
 91.	Dirty Higher Order Bits
 92.	Complex Modifiers
 93.	Experimental Language Features
-94.	Constructor call
+94.	Call Depth Attack
 95.	Historic Attacks > Constructor Names
 96.	Payable Multicall
 97.	Presence of unused variables

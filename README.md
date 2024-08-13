@@ -68,13 +68,13 @@ Here is the list of the vulnerabilities:
 62.	Shadowing State Variables
 63.	Typographical Error
 64.	Unencrypted Private Data On-Chain
-65.	Unexpected Ether balance
+65.	~~Unexpected Ether balance~~
 66.	Uninitialized Storage Pointer
 67.	Unprotected Ether Withdrawal
 68.	Unprotected Upgrades
 69.	Use of Deprecated Solidity Functions
-70.	Write to Arbitrary Storage Location
-71.	Wrong inheritance
+70.	~~Write to Arbitrary Storage Location~~
+71.	~~Wrong inheritance~~
 72.	Unsupported Opcodes
 73.	Write to Arbitrary Storage Location
 74.	Hash Collision when using abi.encodePacked() with Multiple Variable-Length Arguments

@@ -51,7 +51,7 @@ Here is the list of the vulnerabilities:
 45.	Assert Violation
 46.	Bypass Contract Size Check
 47.	Code With No Effects
-48.	Entropy Illusion
+48.	~~Entropy Illusion~~
 49.	Function Selector Abuse
 50.	Floating Pragma
 51.	Forcibly Sending Ether to a Contract

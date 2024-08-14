@@ -54,7 +54,7 @@ Here is the list of the vulnerabilities:
 48.	~~Entropy Illusion~~
 49.	Function Selector Abuse
 50.	Floating Pragma
-51.	Forcibly Sending Ether to a Contract
+51.	~~Forcibly Sending Ether to a Contract~~
 52.	Function Default Visibility
 53.	Hash Collisions With Multiple Variable Length Arguments
 54.	Improper Array Deletion

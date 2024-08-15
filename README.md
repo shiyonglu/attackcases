@@ -4,8 +4,8 @@ This repository contains various smart contract attacks. It can be used to test 
 Here is the list of the vulnerabilities: 
 
  
- 1.	Distribution
- 2.	Denial of Service (DOS)
+ 1.	Denial of Service (DOS)
+ 2.	Distribution
  3.	First-depositor-attack
  4.	Flashloan-attack
  5.	Front Running

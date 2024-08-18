@@ -36,9 +36,9 @@ Here is the list of the vulnerabilities:
 30.	ERC20 ERC777 in ERC20 clothing
 31.	ERC20 Not all ERC20 tokens return true
 32.	msg.value in a loop
-33.	Private Variables
+33.	~~Private Variables~~
 34.	Overpowered Admins
-35.	Use Ownable2Step instead of Ownable
+35.	~~Use Ownable2Step instead of Ownable~~
 36.	Rounding Errors
 37.	Signatures ecrecover returns invalid address
 38.	Signature replay

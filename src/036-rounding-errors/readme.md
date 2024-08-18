@@ -1,6 +1,4 @@
 # Solidity Rounding Errors Vulnerability
-
-#### Context
 Solidity does not support floating-point numbers, so rounding errors are inevitable. Developers must be conscious of whether to round up or down and in whose favor the rounding should be.
 
 #### Example

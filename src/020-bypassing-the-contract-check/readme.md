@@ -1,51 +1,66 @@
-# Bypassing Contract Check: Understanding and Limitations
+# Bypassing the Contract Check Vulnerability in Solidity
 
-## Overview
-In Solidity, developers sometimes need to determine whether an address is a smart contract or an externally owned account (EOA). This is often done by checking the bytecode size at the address. However, this method has several limitations and can lead to potential vulnerabilities. This document provides an overview of how to check if an address is a contract, the limitations of these methods, and potential risks.
+**Bypassing the contract check** vulnerability occurs when an attacker can exploit the limitations of checking if an address is a smart contract. This check is typically done by examining the bytecode size of the address. Externally owned accounts (EOAs) do not have any bytecode, while smart contracts do.
 
-## Methods for Checking if an Address is a Contract
+#### Example of Vulnerable Contract
 
-### Using OpenZeppelin's Address Library
+Here's an example of a contract that checks if an address is a smart contract:
 
- # The testing coe is here:
- // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+```solidity
+import "@openzeppelin/contracts/utils/Address.sol";
 
-import "forge-std/Test.sol";
-import "../contracts/CheckIfContract.sol";
-import "../contracts/Create2Deployer.sol";
+contract CheckIfContract {
 
-contract BypassContractCheck is Test {
-    CheckIfContract public checkIfContract;
-    Create2Deployer public create2Deployer;
-    address attacker;
+    using Address for address;
 
-    function setUp() public {
-        checkIfContract = new CheckIfContract();
-        create2Deployer = new Create2Deployer();
-        attacker = address(0x1234);
+    function addressIsContractV1(address _a) public view returns (bool) {
+        return _a.code.length != 0;
     }
 
-    function testBypassContractCheck() public {
-        // Bytecode of a simple contract
-        bytes memory bytecode = hex"6080604052348015600f57600080fd5b5060006000fdfea2646970667358221220e2e22e1b5165c9b77e9c9e79aaf9c946fe8d93e10f0e2f8f49b499187d17c5e064736f6c634300080a0033";
-
-        // Compute the future address
-        bytes32 salt = bytes32(uint256(1234));
-        bytes32 bytecodeHash = keccak256(bytecode);
-        address futureAddress = create2Deployer.computeAddress(salt, bytecodeHash);
-
-        // Check if futureAddress is a contract before deployment
-        bool isContract = checkIfContract.addressIsContract(futureAddress);
-        assertEq(isContract, false);
-
-        // Deploy the contract to the computed address using CREATE2
-        vm.startPrank(attacker);
-        create2Deployer.deploy(uint256(salt), bytecode);
-        vm.stopPrank();
-
-        // Check if futureAddress is a contract after deployment
-        isContract = checkIfContract.addressIsContract(futureAddress);
-        assertEq(isContract, true);
+    function addressIsContractV2(address _a) public view returns (bool) {
+        // use the OpenZeppelin library
+        return _a.isContract();
     }
 }
+```
+
+#### Limitations
+
+1. **Constructor Calls**: If a contract makes an external call from its constructor, its apparent bytecode size will be zero because the smart contract deployment code hasn't returned the runtime code yet.
+2. **Future Deployments**: An attacker might know they can deploy a smart contract at a specific address in the future using `CREATE2`, which allows them to predict the address of the contract.
+3. **Antipattern**: Checking if an address is a contract is usually (but not always) an antipattern. Multisignature wallets are smart contracts themselves, and doing anything that might break multisignature wallets breaks composability.
+
+#### Prevention
+
+While checking if an address is a contract can be useful in some scenarios, it's important to understand its limitations and use it judiciously. Here are some preventive measures:
+
+1. **Avoid Over-Reliance on Contract Checks**: Instead of relying solely on contract checks, consider other security measures such as access control, rate limiting, and proper validation of inputs.
+2. **Use `CREATE2` with Caution**: Be aware of the potential for future deployments using `CREATE2` and design your contracts accordingly.
+3. **Multisignature Wallets**: Ensure that your contract logic does not inadvertently break multisignature wallets or other composable smart contracts.
+
+#### Example of Improved Contract
+
+Here's an improved version of the contract that includes additional security measures:
+
+```solidity
+import "@openzeppelin/contracts/utils/Address.sol";
+
+contract ImprovedCheckIfContract {
+
+    using Address for address;
+
+    function addressIsContract(address _a) public view returns (bool) {
+        return _a.isContract();
+    }
+
+    function safeFunction(address _a) public {
+        require(_a.isContract(), "Address is not a contract");
+        // Additional security measures
+        // ...
+    }
+}
+```
+
+In this improved version, the `safeFunction` includes a check to ensure the address is a contract before proceeding with additional logic. However, it's important to combine this with other security measures to mitigate the limitations mentioned earlier.
+
+By understanding the limitations and using contract checks judiciously, you can enhance the security of your smart contracts and prevent potential vulnerabilities.

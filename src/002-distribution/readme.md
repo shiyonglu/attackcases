@@ -1,3 +1,5 @@
+# Distribuition Attack
+
 In the context of Ethereum and Solidity smart contracts, a distribution attack can refer to various scenarios where the distribution of tokens, Ether, or other assets is manipulated or exploited by malicious actors. One common type of distribution attack involves exploiting flaws in a smart contract's logic to unfairly distribute assets or to prevent the fair distribution of assets.
 
 ### Example of a Distribution Attack

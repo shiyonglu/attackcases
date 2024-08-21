@@ -16,6 +16,11 @@ contract GasLimitAttackTest is Test {
         attack = new GasLimitAttack(address(example));
     }
 
+    function testSelectNextWinners() public {
+        example.selectNextWinners(100);
+        assertEq(example.largestWinner(), 100);
+    }
+
     function testAttack_GasLimitAttack() public {
         vm.expectRevert();
         attack.attack();

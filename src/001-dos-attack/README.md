@@ -39,7 +39,7 @@ Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, 
    ```
    - **Attack**: If the `president` is a smart contract that deliberately fails the transfer (e.g., by not having a payable fallback function or by reverting on receipt), the `becomePresident` function will revert, and the presidency cannot be transferred.
 
-3. **Unexpected Kill**:
+3. **Unexpected Kill**: Check attack no 011
    - Contracts can be permanently disabled if a function allows an attacker to trigger the `selfdestruct` operation, which can remove the contract code from the blockchain and render it non-functional.
 
    **Example**:

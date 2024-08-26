@@ -8,3 +8,6 @@ A malicious contract can use selfdestruct to force sending Ether to any contract
 
 ## Preventative Techniques
 Don't rely on address(this).balance
+
+
+Check the solidity examples.

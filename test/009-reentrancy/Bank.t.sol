@@ -1,32 +1,68 @@
-pragma solidity 0.8.17;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.23;
 
 import "forge-std/Test.sol";
-import "../../src/009-reentrancy/Bank.sol";
+import "src/009-reentrancy/Bank.sol";
 
-// import "../src/attack002.sol";
+contract BankTest is Test {
+    Bank public bank;
+    Attacker public attacker;
 
-/* this contract, Bob: deployer
-   address(1): Alice: trustAccount, 
-*/
+    address payable owner;
+    address payable attackerAddress;
 
-contract testBank is Test {
-    Bank mybank;
-    Attacker alice;
+    receive() external payable {}
 
     function setUp() public {
-        mybank = new Bank();
-        // alice = new Attacker(payable(mybank));
+        // Deploy the Bank contract
+        bank = new Bank();
 
-        (bool success, ) = address(mybank).call{value: 1000000}("");
-        if (!success) revert();
+        // Set up owner and attacker accounts
+        owner = payable(address(this));
+        attackerAddress = payable(vm.addr(1));
 
-        (success, ) = address(1).call{value: 1000}("");
-        if (!success) revert();
-
-        // assertEq(address(mybank).balance, 1000000);
+        // Deploy the Attacker contract with the Bank address
+        vm.prank(attackerAddress);
+        attacker = new Attacker(payable(address(bank)));
     }
 
-    function testSteal() public {
-        //
+    function testDeposit() public {
+        // Deposit 1 ether from the owner account
+        bank.deposit{value: 1 ether}();
+        assertEq(bank.getBalance(), 1 ether);
+    }
+
+    function testWithdraw() public {
+        // Deposit 1 ether from the owner account
+        bank.deposit{value: 1 ether}();
+        assertEq(bank.getBalance(), 1 ether);
+
+        // Withdraw the deposited ether
+        bank.withdraw();
+        assertEq(bank.getBalance(), 0);
+    }
+
+    function testReentrancyAttack() public {
+        // Add funds from different accounts
+        vm.deal(address(1), 1 ether);
+        vm.prank(address(1));
+        bank.deposit{value: 1 ether}();
+
+        vm.deal(address(2), 1 ether);
+        vm.prank(address(2));
+        bank.deposit{value: 1 ether}();
+
+        assertEq(address(bank).balance, 2 ether);
+
+        // Deposit 1 ether from the attacker account to the Bank contract
+        vm.deal(attackerAddress, 1 ether);
+        vm.prank(attackerAddress);
+        attacker.attack{value: 1 ether}();
+
+        // Attacker should have all of the money
+        assertEq(attackerAddress.balance, 3 ether);
+
+        // Bank should be empty
+        assertEq(address(bank).balance, 0);
     }
 }

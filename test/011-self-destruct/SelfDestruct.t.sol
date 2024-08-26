@@ -14,13 +14,6 @@ contract SelfDestructTest is Test {
     function setUp() public {
         etherGame = new EtherGame();
         attackContract = new Attack(etherGame);
-
-        // Fund Alice and Bob with 1 ether each
-        vm.deal(alice, 1 ether);
-        vm.deal(bob, 1 ether);
-
-        // Fund the Attack contract with 5 ether
-        vm.deal(address(attackContract), 5 ether);
     }
 
     function testClaimRewardSuccess() public {
@@ -51,10 +44,12 @@ contract SelfDestructTest is Test {
 
     function testSuccessfulAttack() public {
         // Alice and Bob deposit 1 ether each
+        vm.deal(alice, 1 ether);
         vm.startPrank(alice);
         etherGame.deposit{value: 1 ether}();
         vm.stopPrank();
 
+        vm.deal(bob, 1 ether);
         vm.startPrank(bob);
         etherGame.deposit{value: 1 ether}();
         vm.stopPrank();
@@ -63,6 +58,7 @@ contract SelfDestructTest is Test {
         assertEq(address(etherGame).balance, 2 ether);
 
         // Now the Attack contract sends 5 ether to break the game
+        vm.deal(address(attackContract), 5 ether);
         vm.startPrank(address(attackContract));
         attackContract.attack{value: 5 ether}();
         vm.stopPrank();
@@ -77,15 +73,18 @@ contract SelfDestructTest is Test {
 
     function testClaimRewardFailure() public {
         // Simulate attack and broken game scenario
+        vm.deal(alice, 1 ether);
         vm.startPrank(alice);
         etherGame.deposit{value: 1 ether}();
         vm.stopPrank();
 
+        vm.deal(bob, 1 ether);
         vm.startPrank(bob);
         etherGame.deposit{value: 1 ether}();
         vm.stopPrank();
 
         // Attack to reach the 7 ether target balance
+        vm.deal(address(attackContract), 5 ether);
         vm.startPrank(address(attackContract));
         attackContract.attack{value: 5 ether}();
         vm.stopPrank();

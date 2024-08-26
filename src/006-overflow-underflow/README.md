@@ -53,39 +53,7 @@ These vulnerabilities can be exploited in various ways, such as allowing an atta
    - **Attack**: The attacker repeatedly calls `popArrayOfThings()`.
    - **Result**: Due to underflow, the array length becomes a very large number, potentially leading to out-of-bounds errors or other unintended behavior.
 
-3. **Voting Function with Arithmetic Error**:
 
-   This example shows how a voting function can be exploited if the arithmetic is not properly handled.
-
-   ##### Vulnerable Code Example:
-   ```solidity
-   function votes(uint postId, uint upvote, uint downvote) public {
-       if (upvote - downvote < 0) {
-           deletePost(postId);
-       }
-   }
-   ```
-
-   **Exploit Scenario**:
-   - **Condition**: The function calculates the difference between upvotes and downvotes.
-   - **Attack**: An attacker ensures that `upvote` is less than `downvote`, causing an underflow.
-   - **Result**: The underflow triggers the deletion of a post that shouldn’t have been deleted.
-
-4. **Loop with `var` and `uint8` Overflow**:
-
-   Using `var` in loops can be dangerous if the inferred type is not large enough to handle the loop's maximum value.
-
-   ##### Vulnerable Code Example:
-   ```solidity
-   for (var i = 0; i < somethingLarge; i++) {
-       // loop logic
-   }
-   ```
-
-   **Exploit Scenario**:
-   - **Condition**: The loop is expected to iterate more than 255 times.
-   - **Attack**: The loop uses `var`, which might infer `uint8`.
-   - **Result**: The loop variable `i` overflows after 255, causing the loop to behave unexpectedly.
 
 #### Prevention
 
@@ -105,10 +73,7 @@ These vulnerabilities can be exploited in various ways, such as allowing an atta
 2. **Explicitly Check for Overflows and Underflows**:
    - Always check that arithmetic operations do not overflow or underflow, particularly in critical sections like fund transfers or voting mechanisms.
 
-3. **Avoid Using `var` for Critical Logic**:
-   - Avoid using `var` in loops or critical sections where the inferred type could lead to overflow. Instead, explicitly declare the variable type.
-
-4. **Be Cautious with Array Length Manipulation**:
+3. **Be Cautious with Array Length Manipulation**:
    - When manipulating array lengths, ensure that checks are in place to prevent underflow or overflow.
 
 

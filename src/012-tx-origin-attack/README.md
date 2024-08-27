@@ -1,79 +1,55 @@
 # What is Tx Origin Attack?
-A "Tx Origin Attack" in the context of blockchain and smart contracts occurs when an attacker deploys a malicious contract disguised as a regular wallet. This malicious contract, when funded by the owner of a vulnerable smart contract, deceives the owner into thinking they are performing actions only the owner should be able to do. The attacker exploits the tx.origin variable, which initially appears to represent the owner's externally owned account (EOA). However, the attacker's contract uses this deceptive information to carry out unauthorized actions, potentially leading to the theft of funds, private keys, or other sensitive data. To prevent such attacks, it is crucial for developers to use msg.sender for access control within smart contracts and for users to exercise caution when interacting with unfamiliar contracts.
 
-```solidity 
+A **Tx Origin Attack** in Solidity exploits the `tx.origin` variable, which is often misused for authentication purposes. The `tx.origin` is a global variable in Solidity that returns the address of the original external account (EOA) that initiated the transaction. 
 
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
-// phishing with tx.origin
+### How the Attack Works:
+1. **Basic Concept**:
+   - An attacker tricks the contract into thinking that the transaction is coming from a trusted source by exploiting the `tx.origin` variable.
+   - The contract might have a function that checks if `tx.origin` is equal to the owner’s address, allowing sensitive actions like transferring funds if the check passes.
 
-contract txorigin_wallet{
-    address public owner;
+2. **Exploitation Scenario**:
+   - Suppose there's a contract `A` that uses `tx.origin` to verify the owner:
+     ```solidity
+     function withdraw() public {
+         require(tx.origin == owner);
+         msg.sender.transfer(this.balance);
+     }
+     ```
+   - An attacker creates a malicious contract `B` and convinces the owner of contract `A` to interact with it, perhaps by calling a function that seems harmless.
+   - Within this function, the attacker’s contract `B` calls the `withdraw` function of contract `A`.
+   - Since `tx.origin` points to the original caller (the owner), not `msg.sender` (which would be contract `B`), the condition `tx.origin == owner` passes, and the funds are transferred to `msg.sender`, which is under the control of the attacker.
 
-    constructor(){
-         owner = msg.sender;
-    }
+### Mitigation:
+To prevent a `tx.origin` attack, the code should avoid using `tx.origin` for authentication and instead rely on `msg.sender`. Here's how you can modify the original contract to prevent the attack:
 
-    function deposit() public payable{
-    }
 
-    function transfer(address payable to, uint amt) public{
-         require(tx.origin == owner, "Not the owner");
-         (bool sent, ) = to.call{value: amt}("");
-        require(sent, "failed to send ether");
-    }
-
-    function getBalance() public view returns (uint){
-        return address(this).balance;
-    }
+```solidity
+function withdraw() public {
+    require(msg.sender == owner, "Not authorized");
+    payable(msg.sender).transfer(address(this).balance);
 }
+```
+
+The `require(msg.sender == owner, "Not authorized");` line ensures that only the owner can call the `withdraw()` function. Since the check is now on `msg.sender`, even if another contract tries to call this function, the `msg.sender` would be that contract's address, not the original EOA (externally owned account), preventing unauthorized access.
+
+### Additional Best Practices:
+**Use OpenZeppelin's `Ownable` Contract**: For a more robust and tested implementation, you can use OpenZeppelin's `Ownable` contract, which handles ownership and access control securely.
+  
+  ```solidity
+  // SPDX-License-Identifier: MIT
+  pragma solidity ^0.8.0;
+
+  import "@openzeppelin/contracts/access/Ownable.sol";
+
+  contract SecureContract is Ownable {
+      function withdraw() public onlyOwner {
+          payable(owner()).transfer(address(this).balance);
+      }
+
+      // Function to receive Ether
+      receive() external payable {}
+  }
+  ```
 
 
-``` 
-
-
-
-# How does it happen?
-A "tx.origin" attack is a security vulnerability in smart contracts on blockchains like Ethereum. It happens when a malicious contract relies on the "tx.origin" variable to identify the original sender of a transaction. An attacker lures a user into interacting with their malicious contract, and if that user interacts with the attacker's contract while originating from a different contract, the attacker's contract can be tricked into thinking the user is someone else, potentially leading to unauthorized actions or loss of funds. To mitigate such attacks, developers are advised to use the more secure msg.sender variable instead of tx.origin when determining the sender of a transaction within their smart contracts, as msg.sender always represents the immediate sender of the transaction and cannot be as easily manipulated or spoofed.
-
-# Example of Tx Origin Attack.
-Here is an example code for tx origin attack.
-
-```solidity 
-
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
-// phishing with tx.origin
-
-interface Itxorigin{
-       function transfer(address payable to, uint amt) external;
-       function getBalance() external view returns (uint);       
-}
-
-contract attacktxorigin{
-         address public owner;
-         Itxorigin public immutable mytxorigin;
-
-        constructor (address  addr){
-            mytxorigin = Itxorigin(addr);
-            owner = msg.sender;
-         }
-
-        receive() external payable {
-                      mytxorigin.transfer(payable(owner), mytxorigin.getBalance());
-        }                     
-}
-
-
-``` 
-
-
-# How to prevent?
-- Never use tx.origin to check for authorisation of ownership, instead use msg.sender
-- Don’t use address.call.value(amount)(); instead use address.transfer()
-address.transfer() will have a gas stipend of 2300 — meaning possible attacking contracts would not have enough gas for further computation other than emitting Events
-
-# How to use our code: 
-- First you need to deploy the txorigin_wallet contract. You can perform deposit and balance check operation here.
-- Then you deploy the attacktxorigin contact.
-- Using owner account you try to transfer an amojnt to another address. That address will be the owner and transfer all the money from smart conrtact to its own account.
+By making these changes, the contract is protected against `tx.origin` attacks, ensuring that only the legitimate owner can withdraw funds or perform other sensitive actions.

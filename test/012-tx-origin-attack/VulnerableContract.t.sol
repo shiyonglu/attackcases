@@ -5,27 +5,41 @@ import "forge-std/Test.sol";
 import "src/012-tx-origin-attack/txorigin.sol";
 
 contract TxOriginTest is Test {
-    TxOrigin vulnerableContract;
-    AttackContract attackContract;
-    address attacker = address(0xDEAD);
+    TxOrigin public txOrigin;
+    AttackContract public attackContract;
 
-    function beforeEach() public {
-        vulnerableContract = new TxOrigin();
-        attackContract = new AttackContract(address(vulnerableContract));
-
-        // Fund the vulnerable contract with 10 Ether
-        vm.deal(address(vulnerableContract), 10 ether);
+    function setUp() public {
+        txOrigin = new TxOrigin();
+        attackContract = new AttackContract(address(txOrigin));
+        vm.deal(address(txOrigin), 1 ether);
     }
 
-    function testAttack_TxOrigin() public {
-        assertEq(address(vulnerableContract).balance, 10 ether);
-        assertEq(address(attackContract).balance, 0);
+    function testWithdrawAsOwner() public {
+        // Set up the owner's balance
+        
 
-        vm.startPrank(attacker);
+        // Withdraw as the owner
+        txOrigin.withdraw();
+
+        // Assert that the owner's balance has been transferred
+        assertEq(address(txOrigin).balance, 0);
+    }
+
+    function testWithdrawAsAttacker() public {
+        // Set up the attacker's balance
+
+        // Attack the vulnerable contract
         attackContract.attack();
-        vm.stopPrank();
 
-        assertEq(address(vulnerableContract).balance, 0);
-        assertEq(address(attackContract).balance, 10 ether);
+        // Assert that the vulnerable contract's balance has been transferred to the attacker
+        assertEq(address(txOrigin).balance, 0);
+        assertEq(address(attackContract).balance, 1 ether);
     }
+
+    function testWithdrawRevertsIfNotAuthorized() public {
+        // Try to withdraw as an unauthorized user
+        vm.expectRevert("Not authorized");
+        txOrigin.withdraw();
+    }
+
 }

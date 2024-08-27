@@ -9,9 +9,18 @@ contract ShortAddressAttack {
         balances[msg.sender] += msg.value;
     }
 
-    // Vulnerable transfer function that doesn't check the length of the address
+    // More secure transfer function with a check on address length via calldata length
     function transfer(address _to, uint256 _amount) public {
+        // Ensure that the length of calldata matches what is expected for this function
+        require(msg.data.length == 68, "Invalid calldata length");
+
+        // Check that the address is not the zero address
+        require(_to != address(0), "Invalid address");
+
+        // Ensure the sender has enough balance
         require(balances[msg.sender] >= _amount, "Insufficient balance");
+
+        // Perform the transfer
         balances[msg.sender] -= _amount;
         balances[_to] += _amount;
     }

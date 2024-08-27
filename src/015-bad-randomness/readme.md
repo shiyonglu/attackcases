@@ -16,11 +16,12 @@ Randomness is a challenging aspect to implement securely in Ethereum smart contr
 
    **Example**:
    ```solidity
+   address[] public players;
+   
    function play() public payable {
-       require(msg.value >= 1 ether);
-       if (block.blockhash(blockNumber) % 2 == 0) {
-           msg.sender.transfer(address(this).balance);
-       }
+        // Using block number to generate a "random" index
+        uint256 randomIndex = block.number % players.length;
+        address winner = players[randomIndex];
    }
    ```
    - **Attack**: An attacker can use a smart contract to check the block hash and only proceed with the transaction if the conditions for winning are met. Since the block hash can be predicted or controlled within a certain degree by miners, this method of randomness is unreliable.

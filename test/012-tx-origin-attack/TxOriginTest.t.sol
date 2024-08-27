@@ -58,4 +58,23 @@ contract TxOriginTest is Test {
         assertEq(address(txOrigin).balance, 0);
         assertEq(address(attackContract).balance, 10 ether);
     }
+
+    function testWithdrawSecureAsAttacker() public {
+        assertEq(address(txOrigin).balance, 10 ether);
+
+        // Withdraw as the attacker
+        vm.startPrank(address(0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38));
+
+        emit log_named_address("Test tx.origin", tx.origin);
+        emit log_named_address("Test msg.sender", msg.sender);
+        emit log_named_address("Test address", address(this));
+
+        vm.expectRevert();
+        attackContract.attack_secure();
+
+        vm.stopPrank();
+
+        assertEq(address(txOrigin).balance, 10 ether);
+        assertEq(address(attackContract).balance, 0);
+    }
 }

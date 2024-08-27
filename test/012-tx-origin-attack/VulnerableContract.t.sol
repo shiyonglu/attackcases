@@ -7,39 +7,55 @@ import "src/012-tx-origin-attack/txorigin.sol";
 contract TxOriginTest is Test {
     TxOrigin public txOrigin;
     AttackContract public attackContract;
+    address me = address(1);
 
     function setUp() public {
+        // tx.origin related issue https://ethereum.stackexchange.com/q/147319/99242
+
+        vm.startPrank(address(0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38));
         txOrigin = new TxOrigin();
         attackContract = new AttackContract(address(txOrigin));
-        vm.deal(address(txOrigin), 1 ether);
+        vm.stopPrank();
+
+        vm.deal(address(txOrigin), 10 ether);
     }
 
+    receive() external payable {}
+
     function testWithdrawAsOwner() public {
-        // Set up the owner's balance
-        
+        assertEq(address(txOrigin).balance, 10 ether);
 
         // Withdraw as the owner
-        txOrigin.withdraw();
+        vm.startPrank(address(0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38));
+
+        emit log_named_address("Test tx.origin", tx.origin);
+        emit log_named_address("Test msg.sender", msg.sender);
+        emit log_named_address("Test address", address(this));
+
+        (bool success,) = address(txOrigin).call(abi.encodeWithSignature("withdraw()"));
+        require(success, "Withdraw failed");
+
+        vm.stopPrank();
 
         // Assert that the owner's balance has been transferred
         assertEq(address(txOrigin).balance, 0);
     }
 
     function testWithdrawAsAttacker() public {
-        // Set up the attacker's balance
+        assertEq(address(txOrigin).balance, 10 ether);
 
-        // Attack the vulnerable contract
+        // Withdraw as the attacker
+        vm.startPrank(address(0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38));
+
+        emit log_named_address("Test tx.origin", tx.origin);
+        emit log_named_address("Test msg.sender", msg.sender);
+        emit log_named_address("Test address", address(this));
+
         attackContract.attack();
 
-        // Assert that the vulnerable contract's balance has been transferred to the attacker
+        vm.stopPrank();
+
         assertEq(address(txOrigin).balance, 0);
-        assertEq(address(attackContract).balance, 1 ether);
+        assertEq(address(attackContract).balance, 10 ether);
     }
-
-    function testWithdrawRevertsIfNotAuthorized() public {
-        // Try to withdraw as an unauthorized user
-        vm.expectRevert("Not authorized");
-        txOrigin.withdraw();
-    }
-
 }

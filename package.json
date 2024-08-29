@@ -1,0 +1,19 @@
+{
+  "name": "attackcases",
+  "version": "1.0.0",
+  "description": "This repository contains various smart contract attacks. It can be used to test the performance of different smart contract audit tools. This repository is compatible with Foundry. To test each vulnerability, clone this repository to your PC, compile it using the forge compile command, and run all tests using the forge test command.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "web3": "^4.12.1"
+  }
+}

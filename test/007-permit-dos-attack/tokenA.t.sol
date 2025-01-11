@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "../../proxy/TokenA.sol";
+import "src/007-permit-dos-attack/TokenA.sol";
 import {Test} from "forge-std/Test.sol";
 import {console2} from "forge-std/console2.sol";
 import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";

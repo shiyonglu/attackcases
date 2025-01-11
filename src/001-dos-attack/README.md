@@ -39,7 +39,7 @@ Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, 
    ```
    - **Attack**: If the `president` is a smart contract that deliberately fails the transfer (e.g., by not having a payable fallback function or by reverting on receipt), the `becomePresident` function will revert, and the presidency cannot be transferred.
 
-3. **Unexpected Kill**: Check attack no 011
+3. **Unexpected Kill**: Check attack no 011 (selfdestruct will no longer remove code from blockchain)
    - Contracts can be permanently disabled if a function allows an attacker to trigger the `selfdestruct` operation, which can remove the contract code from the blockchain and render it non-functional.
 
    **Example**:
@@ -52,7 +52,7 @@ Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, 
    ```
    - **Attack**: If the ownership control is weak or misconfigured, an attacker might gain ownership and call `selfdestruct`, permanently destroying the contract.
 
-4. **Access Control Breached**:
+4. **Access Control Breached**: check attack no 
    - Improper access control can allow unauthorized users to call sensitive functions, leading to DoS conditions. For instance, if a withdrawal function is accessible to anyone, an attacker could drain the contract or lock the funds, making it impossible for legitimate users to interact with it.
 
    **Example**:
@@ -69,6 +69,29 @@ Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, 
 
 1. **Gas Optimization**:
    - Avoid loops or other operations that might consume excessive gas. Use off-chain calculations when possible and design functions to be as gas-efficient as possible.
+   - Add checks to ensure that the function doesn't attempt to process more than a safe amount of data in a single transaction. This can be done by limiting the input size or breaking the task into smaller manageable chunks.
+
+   **Appraoch 1: Use of gasleft()**
+   Utilize the gasleft() function to check the remaining gas and abort the operation if it's too low to prevent running out of gas mid-operation:
+
+   ```solidity
+   function withdraw(uint256 _amount) public {
+       require(balances[msg.sender] >= _amount);
+       balances[msg.sender] -= _amount;
+       msg.sender.transfer(_amount);
+   }
+   ```
+
+   **Appraoch 1: Input Validation**
+   Validate inputs to prevent excessively large numbers that can lead to high gas consumption.
+
+   ```solidity
+   function selectNextWinners(uint256 numWinners) public {
+      require(numWinners <= MAX_WINNERS, "Exceeds maximum number of winners allowed");
+      // Processing logic here
+   }
+   ```
+
 
 2. **Check for Call Failures**:
    - Always check the return values of external calls and handle them appropriately to avoid unexpected reverts.

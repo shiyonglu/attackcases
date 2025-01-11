@@ -105,3 +105,11 @@ Here is the list of the vulnerabilities:
 99.	Block values as a proxy for time
 
  
+
+Todo:
+Create video for each vulnerability, the content should include:
+
+- An explanation of the source code.
+- A detailed discussion of the vulnerability.
+- A demonstration of testing using Foundry.
+- Presentation of the mitigation strategies and how the vulnerability is fixed.

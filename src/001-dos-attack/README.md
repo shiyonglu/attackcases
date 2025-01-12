@@ -52,18 +52,16 @@ Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, 
    ```
    - **Attack**: If the ownership control is weak or misconfigured, an attacker might gain ownership and call `selfdestruct`, permanently destroying the contract.
 
-4. **Access Control Breached**: check attack no 
-   - Improper access control can allow unauthorized users to call sensitive functions, leading to DoS conditions. For instance, if a withdrawal function is accessible to anyone, an attacker could drain the contract or lock the funds, making it impossible for legitimate users to interact with it.
+4. **Vulnearable Logic**: 
+   DOS vulnerability can arise from vulnearable logic. See the following example that can be used to subtract money from bank.
 
-   **Example**:
    ```solidity
-   function withdraw(uint256 _amount) public {
-       require(balances[msg.sender] >= _amount);
-       balances[msg.sender] -= _amount;
-       msg.sender.transfer(_amount);
-   }
+    function subtractAmount(uint256 amount) public onlyAdmin {
+        require(collateralToken.balanceOf(address(this)) == totalCollateral - amount);
+        totalCollateral -= amount;
+    }
    ```
-   - **Attack**: If `withdraw()` does not correctly restrict access, an attacker could repeatedly call it and withdraw all funds, disrupting the contract's intended functionality.
+    Here if a user give some token natively using ERC20 transferFrom function then the contract will stop working.
 
 #### Prevention
 
@@ -101,9 +99,14 @@ Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, 
 
 4. **Fail-Safe Design**:
    - Design contracts with safety in mind. Ensure that critical functions cannot be easily manipulated to cause a DoS and that fallback mechanisms exist to recover from potential attacks.
-
-
-
+    For the vulnerable logic contract above, we need to check the balance directly and should not depend on totalCollateral
+    ```solidity
+    function subtractAmount(uint256 amount) public onlyAdmin {
+        uint256 currentBalance = collateralToken.balanceOf(address(this)); 
+        require(currentBalance >= amount, "Insufficient balance for withdrawal"); 
+        totalCollateral -= amount; 
+    }
+    ```
 
 
 **Additional Resources**:

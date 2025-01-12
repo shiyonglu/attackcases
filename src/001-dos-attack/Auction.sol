@@ -6,11 +6,10 @@ pragma solidity 0.8.17;
 // INSECURE
 contract Auction {
     address payable public currentLeader;
-    uint public highestBid;
+    uint256 public highestBid;
 
-    function bid() payable external {
+    function bid() external payable {
         require(msg.value > highestBid);
-
         require(currentLeader.send(highestBid)); // Refund the old leader, if it fails then revert
 
         currentLeader = payable(msg.sender);

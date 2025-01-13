@@ -52,8 +52,8 @@ Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, 
    ```
    - **Attack**: If the ownership control is weak or misconfigured, an attacker might gain ownership and call `selfdestruct`, permanently destroying the contract.
 
-4. **Vulnearable Logic**: 
-   DOS vulnerability can arise from vulnearable logic. See the following example that can be used to subtract money from bank.
+4. **Vulnerable Logic**: 
+   DOS vulnerability can arise from vulnerable logic. See the following example that can be used to subtract money from bank.
 
    ```solidity
     function subtractAmount(uint256 amount) public onlyAdmin {
@@ -73,14 +73,20 @@ Denial of Service (DoS) attacks in Ethereum smart contracts can be devastating, 
    Utilize the gasleft() function to check the remaining gas and abort the operation if it's too low to prevent running out of gas mid-operation:
 
    ```solidity
-   function withdraw(uint256 _amount) public {
-       require(balances[msg.sender] >= _amount);
-       balances[msg.sender] -= _amount;
-       msg.sender.transfer(_amount);
-   }
+    function selectNextWinners(uint256 numWinners) public {
+        require(numWinners > 0, "Number of winners must be greater than zero");
+
+        for (uint256 i = 0; i < numWinners; i++) {
+            if (gasleft() < 20000) {
+                // Stop the loop early to avoid running out of gas
+                break;
+            }
+            // Processing logic here
+        }
+    }
    ```
 
-   **Appraoch 1: Input Validation**
+   **Appraoch 2: Input Validation**
    Validate inputs to prevent excessively large numbers that can lead to high gas consumption.
 
    ```solidity

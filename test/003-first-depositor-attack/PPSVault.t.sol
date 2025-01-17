@@ -1,4 +1,38 @@
 /*
+Step 1: Initial Deposits and Setup
+Token Allocation: Initially, tokens are distributed among various parties: deployer, first depositor, and victims. The first depositor starts with 1000 ether + 1.
+First Depositor's Deposit: The first depositor approves and deposits 1 token into the vault.
+
+Step 2: Manipulating Share Price
+Inflation of the Vault's Assets: After the initial deposit, the first depositor sends 1000 ether directly to the vault. This doesn't change their shares but significantly inflates the vault's assets.
+Price Per Share Before and After Inflation:
+Before inflation: 1 share for the first depositor's 1 token (asset/share = 1).
+After inflation: The assets in the vault dramatically increase, but the shares remain constant. The new asset/share calculation would show a drastic increase (asset/share > 1000000000000000000000), reflecting the higher asset base per existing share.
+
+Step 3: Subsequent Deposits
+Victim Deposits: Both victim1 and victim2 deposit 2000 ether each.
+Shares Issued Post-Inflation:
+Given the inflated asset base, the number of shares issued to each victim is much less per token than the first depositor received. The asset/share ratio used for these transactions results in each victim receiving far fewer shares compared to the assets they contributed.
+After victim deposits, the asset/share ratios are:
+Victim1: asset/share ≈ 1500000000000000000000
+Victim2: asset/share ≈ 1666666666666666666667
+
+Step 4: Withdrawals and Loss Realization
+First Depositor Withdraws: Withdraws a portion of their shares:
+The first depositor redeems shares and receives a significant amount of assets. asset/share at this time allows them to withdraw a disproportionate amount of assets (not directly stated but inferred from 2666666666666666666666 balance update).
+Victims' Withdrawals:
+Victim1 and Victim2 Withdraw: Both redeem shares and receive fewer assets than their initial deposit value, as the asset/share ratio means they receive less back per share compared to their input.
+Asset/share is recalculated again after each transaction, affecting the next redeemer's withdrawal value.
+Noted balances post-withdrawal:
+Victim1: 1666666666666666666667
+Victim2: 1666666666666666666667
+The losses for victims (around 333 ether each) reflect the fewer assets received compared to the vault’s asset pool.
+
+Conclusion: Outcome of the Attack
+First Depositor's Gain: The first depositor effectively gains assets amounting to 666 ether, exploiting the inflated asset-to-share ratio.
+Victims' Loss: Victim1 and Victim2 incur losses totaling approximately 333 ether each, a direct result of the asset dilution caused by the first depositor's manipulation.
+This breakdown shows how the first depositor manipulates the vault's financial mechanics to their benefit, causing subsequent depositors to receive less than their fair share of the vault's assets.
+
  * By inflating the price per share, first depositor can rip off from victim1 and victiom2 due to 
  * rounding down error introduced by the implementation of ERC4626. 
  * The following log shows the finding: 

@@ -104,6 +104,31 @@ Here is the list of the vulnerabilities:
 98.	Lack of Proper Signature Verification
 99.	Block values as a proxy for time
 
+# To run the tests of these attack cases
+
+# 1. Install Foundry
+curl -L https://getfoundry.sh/install | bash
+source ~/.bashrc
+foundryup
+
+# Check installation
+forge --version
+
+# 2. Clone the repository with its dependencies
+cd ~
+mkdir -p projects
+cd projects
+
+git clone --recurse-submodules https://github.com/shiyonglu/attackcases.git
+cd attackcases
+
+# 3. Compile the contracts
+forge build
+
+# 4. Run all tests under test/
+forge test
+     
+
  
 
 Todo:
